@@ -60,4 +60,6 @@ VCard Generator was developed using the following libraries:
 - pandas
 - vobject
 
+The icon used by this software is created by Freepik
+
 We would like to thank the developers and contributors of these libraries for their valuable work.
