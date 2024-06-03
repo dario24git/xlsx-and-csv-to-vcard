@@ -3,6 +3,7 @@ import csv
 import vobject
 import pandas as pd
 import datetime
+import os
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QFileDialog, QVBoxLayout, QMessageBox, QFrame
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -60,9 +61,13 @@ class VCardGenerator(QWidget):
         # Genera un nuovo nome di file con data e ora corrente
         current_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         vcfFileName = f'Contatti_{current_datetime}.vcf'
+        
+        # Ottieni il percorso del desktop dell'utente
+        desktop_folder = os.path.expanduser("~/Desktop")
+        vcf_file_path = os.path.join(desktop_folder, vcfFileName)
 
         # Cancella il contenuto del file vCard unico
-        open(vcfFileName, 'w').close()
+        open(vcf_file_path, 'w').close()
 
         delimiter = ','
         try:
@@ -75,7 +80,7 @@ class VCardGenerator(QWidget):
         with open(fileName, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
             for row in reader:
-                self.createVCard(row[0], row[1], vcfFileName)
+                self.createVCard(row[0], row[1], vcf_file_path)
 
         QMessageBox.information(self, 'Completato', 'Conversione vCard completata!')
 
@@ -83,17 +88,21 @@ class VCardGenerator(QWidget):
         # Genera un nuovo nome di file con data e ora corrente
         current_datetime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         vcfFileName = f'Contatti_{current_datetime}.vcf'
+        
+        # Ottieni il percorso del desktop dell'utente
+        desktop_folder = os.path.expanduser("~/Desktop")
+        vcf_file_path = os.path.join(desktop_folder, vcfFileName)
 
         # Cancella il contenuto del file vCard unico
-        open(vcfFileName, 'w').close()
+        open(vcf_file_path, 'w').close()
 
         df = pd.read_excel(fileName, header=None, names=['Nome', 'Numero'])
         for _, row in df.iterrows():
-            self.createVCard(row['Nome'], row['Numero'], vcfFileName)
+            self.createVCard(row['Nome'], row['Numero'], vcf_file_path)
 
         QMessageBox.information(self, 'Completato', 'Conversione vCard completata!')
 
-    def createVCard(self, fullName, phoneNumber, vcfFileName):
+    def createVCard(self, fullName, phoneNumber, vcf_file_path):
         try:
             vcard = vobject.vCard()
             vcard.add('fn').value = fullName
@@ -101,7 +110,7 @@ class VCardGenerator(QWidget):
             tel.type_param = 'CELL'
             tel.value = str(phoneNumber)  # Converte phoneNumber in stringa
 
-            with open(vcfFileName, 'a') as vcf:
+            with open(vcf_file_path, 'a') as vcf:
                 vcf.write(vcard.serialize())
         except AttributeError:
             print(f"Errore durante la creazione della vCard per {fullName}: {phoneNumber}")
